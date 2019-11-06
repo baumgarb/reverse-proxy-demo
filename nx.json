@@ -7,5 +7,12 @@
     "tslint.json": "*",
     "nx.json": "*"
   },
-  "projects": {}
+  "projects": {
+    "api-gateway": {
+      "tags": []
+    },
+    "todos-api": {
+      "tags": []
+    }
+  }
 }

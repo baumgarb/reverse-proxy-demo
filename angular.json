@@ -1,7 +1,129 @@
 {
   "version": 1,
-  "projects": {},
+  "projects": {
+    "api-gateway": {
+      "root": "apps/api-gateway",
+      "sourceRoot": "apps/api-gateway/src",
+      "projectType": "application",
+      "prefix": "api-gateway",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/api-gateway",
+            "main": "apps/api-gateway/src/main.ts",
+            "tsConfig": "apps/api-gateway/tsconfig.app.json",
+            "assets": [
+              "apps/api-gateway/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/api-gateway/src/environments/environment.ts",
+                  "with": "apps/api-gateway/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "api-gateway:build",
+            "port": 0
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/api-gateway/tsconfig.app.json",
+              "apps/api-gateway/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/api-gateway/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/api-gateway/jest.config.js",
+            "tsConfig": "apps/api-gateway/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "todos-api": {
+      "root": "apps/todos-api",
+      "sourceRoot": "apps/todos-api/src",
+      "projectType": "application",
+      "prefix": "todos-api",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/todos-api",
+            "main": "apps/todos-api/src/main.ts",
+            "tsConfig": "apps/todos-api/tsconfig.app.json",
+            "assets": [
+              "apps/todos-api/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/todos-api/src/environments/environment.ts",
+                  "with": "apps/todos-api/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "todos-api:build",
+            "port": 0
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/todos-api/tsconfig.app.json",
+              "apps/todos-api/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/todos-api/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/todos-api/jest.config.js",
+            "tsConfig": "apps/todos-api/tsconfig.spec.json"
+          }
+        }
+      }
+    }
+  },
   "cli": {
-    "defaultCollection": "@nrwl/workspace"
-  }
+    "defaultCollection": "@nrwl/nest"
+  },
+  "defaultProject": "api-gateway"
 }

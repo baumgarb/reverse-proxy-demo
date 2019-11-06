@@ -1,84 +1,24 @@
 # ReverseProxyDemo
 
-This project was generated using [Nx](https://nx.dev).
+The purpose of this repo is to demonstrate a problem with a NestJS middlware combined with the npm package `http-proxy-middlware`. There's a corresponding StackOverflow post referring to this repo.
 
-<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
+## Get apps up and running
 
-🔎 **Nx is a set of Extensible Dev Tools for Monorepos.**
+1. Clone the repo
+2. Run `npm install`
+3. Fire up the Todos API via `ng serve todos-api`. Run `curl http://localhost:8090/api` and you should receive a 200 OK response with an array of todos.
+4. Fire up the API Gateway via `ng serve api-gateway`. Run `curl http://localhost:8080/api` and you should receive a 200 OK response with a JSON response `{"ok":true}`.
 
-## Quick Start & Documentation
+## Re-produce the issue
 
-[Nx Documentation](https://nx.dev/angular)
+The following requests are sent to the API Gateway on port `8080` which serves as kind of a reverse proxy for the Todos API which runs on port `8090`.
 
-[10-minute video showing all Nx features](https://nx.dev/angular/getting-started/what-is-nx)
+- Requests made to `http://localhost:8080/api/v1/...` are reverse-proxied through a global functional middleware which is setup in `main.ts`.
+- Requests made to `http://localhost:8080/api/v2/...` are reverse-proxied through a NestJS Middlware which is setup in `reverse-proxy.middleware.ts` and registered in `app.module.ts`.
 
-[Interactive Tutorial](https://nx.dev/angular/tutorial/01-create-application)
+In the following requests you'll see that the GET requests are proxied successfully through both kinds of middlwares. The PUT request, though, is only proxied successfully throug the global functional middlware. Proxying through the Nest JS Middeware fails, the client never receives a response (it's kinda "hanging").
 
-## Adding capabilities to your workspace
-
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
-
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
-
-Below are some plugins which you can add to your workspace:
-
-- [Angular](https://angular.io)
-  - `ng add @nrwl/angular`
-- [React](https://reactjs.org)
-  - `ng add @nrwl/react`
-- Web (no framework frontends)
-  - `ng add @nrwl/web`
-- [Nest](https://nestjs.com)
-  - `ng add @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `ng add @nrwl/express`
-- [Node](https://nodejs.org)
-  - `ng add @nrwl/node`
-
-## Generate an application
-
-Run `ng g @nrwl/angular:app my-app` to generate an application.
-
-> You can use any of the plugins above to generate applications as well.
-
-When using Nx, you can create multiple applications and libraries in the same workspace.
-
-## Generate a library
-
-Run `ng g @nrwl/angular:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are sharable across libraries and applications. They can be imported from `@reverse-proxy-demo/mylib`.
-
-## Development server
-
-Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng g component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
+1. Run `curl http://localhost:8080/api/v1/todos-api` and you should receive the array of todos.
+2. Run `curl http://localhost:8080/api/v2/todos-api` and you should also receive the array of todos.
+3. Run `curl -X PUT -H "Content-Type: application/json" -d "{\"id\": 1, \"userId\": 1, \"title\": \"delectus aut autem - v1\", \"completed\": true}" http://localhost:8080/api/v1/todos-api/1` and you should receive a 200 OK and the todo should have been updated successfully.
+4. Run `curl -X PUT -H "Content-Type: application/json" -d "{\"id\": 1, \"userId\": 1, \"title\": \"delectus aut autem - v2\", \"completed\": true}" http://localhost:8080/api/v2/todos-api/1` and you will never receive a response, the request just keeps "hanging".
