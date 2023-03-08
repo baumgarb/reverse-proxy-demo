@@ -30,7 +30,7 @@
   "private": true,
   "dependencies": {
     "@nestjs/common": "^6.8.3",
-    "@nestjs/core": "^6.8.3",
+    "@nestjs/core": "^9.0.5",
     "@nestjs/platform-express": "^6.8.3",
     "http-proxy-middleware": "^0.20.0",
     "reflect-metadata": "^0.1.13"
